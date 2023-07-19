@@ -1,4 +1,3 @@
-import json
 import pandas as pd
 
 MAX_VARIANCE = 4
@@ -31,12 +30,3 @@ def get_score(x_count : pd.Series):
     aec_score = mean_score - var_score / MAX_VARIANCE
 
     return {"aec": aec_score, "mean_score": mean_score}
-
-if __name__ == '__main__':
-
-    with open('product_json.json') as f:
-        data = json.load(f)
-
-    score = data["product"]["rating_breakdown"]
-    df = to_score_df(score)
-    score=get_score(df["count"])

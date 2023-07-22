@@ -1,4 +1,5 @@
 import pandas as pd
+from typing import List
 
 MAX_VARIANCE = 4
 
@@ -19,10 +20,9 @@ def to_score_df(score_breakdown):
     df = df.set_index("rating")
     return df
 
-def get_score(x_count : pd.Series):
+def get_score(x_count : pd.Series, outcomes: List[int]):
 
     p_measure = x_count/ x_count.sum()
-    outcomes = df.index.values
 
     mean_score = get_expected_value(outcomes, p_measure)
     var_score = get_variance(outcomes, p_measure)

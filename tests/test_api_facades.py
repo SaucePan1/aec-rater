@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -9,7 +10,7 @@ from product_rater.records import DbRecordMaker
 class TestDbRecordMaker:
     @pytest.fixture
     def api_req(self):
-        with open("data/product_json.json") as f:
+        with open(Path(__file__).parent / "data/product_json.json") as f:
             data = json.load(f)
         return data
 

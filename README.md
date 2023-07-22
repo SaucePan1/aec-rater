@@ -27,3 +27,10 @@ Finally, **you must install the pre-commits** that will run the linters on commi
 ```bash
 poetry run pre-commit install
 ```
+
+### Running the tests
+To run the tests you can use the following command:
+
+```bash
+poetry run sh scripts/test.sh
+```

@@ -1,9 +1,13 @@
+import json
+
 import pandas as pd
 import numpy as np
 import uuid
 from time import gmtime, strftime
+import requests
 from src.scorer import get_score
 from src.api_facades import Product
+from src.credentials import API_KEY
 class DbRecordMaker():
 
     def __init__(self, product_object: Product, aec_category: str):
@@ -106,17 +110,49 @@ def make_product_related_db_records(api_req, search_keyword):
     aec_score_record = db_record_maker.aec_score_record()
     return product_record, reviews_records, aec_score_record
 
+
+
 def populate_db_with_keyword_search(keyword):
 
     # get api response keyword search results
+    # set up the request parameters
+    params = {
+        'api_key': API_KEY,
+        'amazon_domain': 'amazon.es',
+        'type': 'search',
+        'search_term': keyword
+    }
 
-    # filter best asin according to rating and number of reviews
-    best_asins = []
+    # make the http GET request to Rainforest API
+    #api_result = requests.get('https://api.rainforestapi.com/request', params)
+    #api_req = api_result.json()
+
+    # Load it for dev purposes
+    with open('data/keyword_search_json.json',) as f:
+        api_req = json.load(f)
+
+
+    #filter best asin according to rating and number of reviews
+    sr = pd.DataFrame.from_records(api_req["search_results"])
+    best_asins = sr[sr["ratings_total"] > 300].sort_values("rating", ascending=False).iloc[:10].asin.values
 
     # loop over best asins, get api request and make records
     for asin in best_asins:
-        api_req = None
-        product_record, reviews_records, aec_score_record = make_product_related_db_records(api_req, keyword)
+        # set up the request parameters
+        params = {
+            'api_key': API_KEY,
+            'amazon_domain': 'amazon.com',
+            'type': 'product',
+            'asin': asin
+        }
+
+        # make the http GET request to Rainforest API
+        #asin_req = requests.get('https://api.rainforestapi.com/request', params)
+
+        with open('notebooks/product_json.json',) as f:
+            asin_req = json.load(f)
+
+        product_record, reviews_records, aec_score_record = make_product_related_db_records(asin_req, keyword)
 
         # insert records in db
         pass

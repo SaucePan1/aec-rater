@@ -1,3 +1,4 @@
+import numpy as np
 
 
 class Product():
@@ -7,28 +8,28 @@ class Product():
     """
     def __init__(self, api_req):
 
-        p = api_req["product"]
-        self.title = p["title"]
-        self.keywords = p["keywords"]
-        self.asin = p["asin"]
-        self.keywords_list = p["keywords_list"]
-        self.parent_asin = p["parent_asin"]
-        self.brand = p["brand"]
-        self.variant_asins = p["variant_asins_flat"]
-        self.main_image_url = p["main_image"]["link"]
-        self.images_urls = p["images_flat"]
-        self.feature_bullets = p["feature_bullets"]
-        self.attributes = p["attributes"]
-        self.price = p["buybox_winner"]["price"]  # Price is not clear which one is it, double check
-        self.categories = p["categories_flat"]
+        p = api_req.get("product", {})
+        self.title = p.get("title", "Title not found")
+        self.keywords = p.get("keywords", "Keywords not found")
+        self.asin = p.get("asin", "ASIN not found")
+        self.keywords_list = p.get("keywords_list", ["Keywords list not found"])
+        self.parent_asin = p.get("parent_asin", "Parent ASIN not found")
+        self.brand = p.get("brand", "Brand not found")
+        self.variant_asins = p.get("variant_asins_flat", ["Variant ASINS not found"])
+        self.main_image_url = p.get("main_image", {}).get("link", "Main image not found")
+        self.images_urls = p.get("images_flat", "Images not found")
+        self.feature_bullets = p.get("feature_bullets", ["Feature bullets not found"])
+        self.attributes = p.get("attributes", [])
+        self.price = p.get("buybox_winner", {}).get("price", np.NAN)  # Price is not clear which one is it, double check
+        self.categories = p.get("categories_flat", "Categories not found")
 
-        self.rating_avg = p["rating"]
-        self.rating_breakdown = p["rating_breakdown"]
+        self.rating_avg = p.get("rating", np.NAN)
+        self.rating_breakdown = p.get("rating_breakdown", {})
         keys = ['five_star', 'four_star', 'three_star', 'two_star', 'one_star']
         self.five_star_count, self.four_star_count, self.three_star_count, self.two_star_count, self.one_star_count \
-            = [self.rating_breakdown[k]["count"] for k in keys]
-        self.ratings_count = p["ratings_total"]
-        self.top_reviews = p["top_reviews"]
+            = [self.rating_breakdown.get(k, {}).get("count") for k in keys]
+        self.ratings_count = p.get("ratings_total", np.NAN)
+        self.top_reviews = p.get("top_reviews", [])
+        self.similar_products = api_req.get("compare_with_similar", [])
 
-        self.similar_products = api_req["compare_with_similar"]
 

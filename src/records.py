@@ -25,7 +25,7 @@ class DbRecordMaker():
 
     @staticmethod
     def _reviews_schema():
-        columns = ["review_id", "timestamp", "product_id", "title", "body", "link",
+        columns = ["review_id", "timestamp", "product_id", "asin", "title", "body", "link",
                    "rating", "post_date", "verified_purchase", "vine_program",
                    "country", "is_global_review", "has_images", "helpful_votes", "origin"]
         dtypes = [str, str, str, str, str, str, int, str, bool, bool, str, bool, bool, int, str]
@@ -80,7 +80,6 @@ class DbRecordMaker():
         Returns review information as a pandas dataframe
         :return:
         """
-        timestamp = self.timestamp
         df_reviews = pd.DataFrame.from_records(self.p.top_reviews)
 
         if "date" in df_reviews.columns:
@@ -91,6 +90,9 @@ class DbRecordMaker():
         else:
             df_reviews["has_images"] = False
 
+        df_reviews["timestamp"] = self.timestamp
+        df_reviews["product_id"] = self.prod_id
+        df_reviews["asin"] = self.p.asin
         df_reviews["origin"] = "amz"
         df_reviews = df_reviews.rename({"id": "review_id", "date": "post_date", "review_country": "country"}, axis=1)
         columns = self._reviews_schema().keys()
@@ -107,7 +109,8 @@ class DbRecordMaker():
         rate_count = np.array([self.p.five_star_count, self.p.four_star_count,
                       self.p.three_star_count, self.p.two_star_count, self.p.one_star_count])
         outcomes = [5,4,3,2,1]
-        overall, _ = get_score(rate_count, outcomes)
+        score = get_score(rate_count, outcomes)
+        overall = score["aec"]
         score_dist_amz = rate_count/rate_count.sum()
         fiability = None
         value = None

@@ -37,9 +37,6 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
     if dev_mode == False:
         save_results = True
 
-    SEARCH_JSON_FILE = "filtros_de_aire_req.json"
-
-
     # get api response keyword search results
     # set up the request parameters
     params = {
@@ -52,6 +49,7 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
     # make the http GET request to Rainforest API
 
     if dev_mode == True:
+        SEARCH_JSON_FILE = "filtros_de_aire_req.json"
     # Load it for dev purposes
         with open(SEARCH_JSON_FILE,) as f:
             api_req = json.load(f)
@@ -125,7 +123,7 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
 
 if __name__ == '__main__':
 
-    populate_db_with_keyword_search("tablet", dev_mode= False, save_results= True)
+    populate_db_with_keyword_search("secador de pelo", dev_mode= False, save_results= True)
 
 
 

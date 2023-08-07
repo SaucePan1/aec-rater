@@ -5,8 +5,8 @@ from time import gmtime, strftime
 import numpy as np
 import pandas as pd
 
-from product_rater.api_facades import Product
-from product_rater.scorer import get_score
+from src.api_facades import Product
+from src.scorer import get_score
 
 
 class DbRecordMaker:

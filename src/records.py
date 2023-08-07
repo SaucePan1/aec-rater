@@ -11,6 +11,7 @@ class DbRecordMaker():
 
     def __init__(self, product_object: Product, keyword_searched: str):
 
+        self.affiliate_tag = "ahorrarenca0b-21"
         self.keyword_searched = keyword_searched
         self.p = product_object
         self.timestamp = self.get_current_time()
@@ -135,21 +136,22 @@ class DbRecordMaker():
         keys = ['five_star', 'four_star', 'three_star', 'two_star', 'one_star']
         return np.array([d[k]["count"] for k in keys]) / self.ratings_count
 
-def make_product_related_db_records(p: Product, search_keyword: str):
-    """
-    This function takes the ASIN API request and the related search keyword and returns the records to be inserted in the database
-    :param api_req:
-    :param search_keyword:
-    :return:
-    """
+    def make_product_related_db_records(self):
+        """
+        This function takes the ASIN API request and the related search keyword and returns the records to be inserted in the database
+        :param api_req:
+        :param search_keyword:
+        :return:
+        """
 
 
-    db_record_maker = DbRecordMaker(product_object=p, keyword_searched=search_keyword)
-    product_record = db_record_maker.product_record()
-    reviews_records = db_record_maker.reviews_records()
-    aec_score_record = db_record_maker.aec_score_record()
-    return product_record, reviews_records, aec_score_record
+        product_record = self.product_record()
+        reviews_records = self.reviews_records()
+        aec_score_record = self.aec_score_record()
+        return product_record, reviews_records, aec_score_record
 
 
-
+    # gets amazon afiliate linkg
+    def amazon_afiliate_link(self, asin):
+        return f"https://www.amazon.es/dp/{asin}/ref=nosim?tag={self.affiliate_tag}"
 

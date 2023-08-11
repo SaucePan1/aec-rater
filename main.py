@@ -4,12 +4,15 @@ import requests
 
 from typing import List
 
-from src.records import make_product_related_db_records
+from src.records import DbRecordMaker
 from src.api_facades import Product
 from src.io import IO
 from src.request_params import API_KEY, AMZ_DOMAIN
 
 class DFContextManager:
+    """
+    This is probably useless but I wanted to try Context Managers.
+    """
     def __init__(self, csv_file_path):
         self.csv_file_path = csv_file_path
         self.df = None
@@ -32,7 +35,7 @@ def remove_asins_found_in_products_csv(best_asins: List[str], csv_file_path: str
 
     return best_asins
 
-def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mode=False, save_results=True):
+def populate_db_with_keyword_search(keyword: str, n_products: int = 10, min_ratings: int = 300,  dev_mode=False, save_results=True):
 
     if dev_mode == False:
         save_results = True
@@ -60,8 +63,10 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
 
     try:
         #filter best asin according to rating and number of reviews
+        print(f"Request successful: {len(api_req['search_results'])} products found")
+        print(f"Credits remaining: {api_req['request_info']['credits_remaining']}")
         sr = pd.DataFrame.from_records(api_req["search_results"])
-        best_asins = sr[sr["ratings_total"] > min_ratings].sort_values("rating", ascending=False).iloc[:10].asin.values
+        best_asins = sr[sr["ratings_total"] > min_ratings].sort_values("rating", ascending=False).iloc[:n_products].asin.values
 
         if dev_mode == False:
             best_asins = remove_asins_found_in_products_csv(best_asins, "data/products.csv")
@@ -98,7 +103,8 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
 
                 product_request = Product(asin_req)
                 print(product_request.title)
-                product_record, reviews_records, aec_score_record = make_product_related_db_records(product_request, keyword)
+                rmaker = DbRecordMaker(product_request, keyword)
+                product_record, reviews_records, aec_score_record = rmaker.make_product_related_db_records()
 
                 # save results
                 print("Data extraction successful, saving results ", save_results)
@@ -123,7 +129,7 @@ def populate_db_with_keyword_search(keyword: str, min_ratings: int = 300, dev_mo
 
 if __name__ == '__main__':
 
-    populate_db_with_keyword_search("secador de pelo", dev_mode= False, save_results= True)
+    populate_db_with_keyword_search("auriculares bluetooth", n_products=15, dev_mode= False, save_results= False)
 
 
 
